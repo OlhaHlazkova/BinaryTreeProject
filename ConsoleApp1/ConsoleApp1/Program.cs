@@ -58,12 +58,22 @@ namespace Hlazkova_8
 
             BinTree<Student> s = new BinTree<Student>();
 
-            Student Student1 = new Student("Ivanov","Maths", new DateTime(2011, 6, 10), 4);
-            Student Student2 = new Student("Ivanov", "Maths", new DateTime(2011, 6, 10), 4);
-            Student Student3 = new Student("Ivanov", "Maths", new DateTime(2011, 6, 10), 4);
-            Student Student4 = new Student("Ivanov", "Maths", new DateTime(2011, 6, 10), 4);
-            Student Student5 = new Student("Ivanov", "Maths", new DateTime(2011, 6, 10), 4);
+            Student Student1 = new Student("Ivanov", "Maths", new DateTime(2011, 6, 10), 3);
+            Student Student2 = new Student("Petrov", "Chemistry", new DateTime(2011, 6, 10), 5);
+            Student Student3 = new Student("Sidorov", "Literature", new DateTime(2011, 6, 10), 4);
+            Student Student4 = new Student("Nikolaev", "Maths", new DateTime(2011, 6, 10), 1);
+            Student Student5 = new Student("Demin", "Maths", new DateTime(2011, 6, 10), 2);
 
+            s.Add(Student1);
+            s.Add(Student2);
+            s.Add(Student3);
+            s.Add(Student4);
+            s.Add(Student5);
+
+            foreach (Student n in s)
+                Console.WriteLine("{0} ", n);
+            Console.WriteLine();
+            Console.ReadKey(true);
 
         }
     }
