@@ -5,52 +5,35 @@ using System.Collections.Generic;
 namespace BinaryTreeLibrary
 {
     public class BinTree<T> : ICollection<T>
-    {
-        protected class Node<TValue>
-        {
-            public TValue Value
-            {
-                get;
-                set;
-            }
-            public Node<TValue> Left
-            {
-                get;
-                set;
-            }
-            public Node<TValue> Right
-            {
-                get;
-                set;
-            }
-
-            public Node(TValue value)
-            {
-                Value = value;
-            }
-        }
-
-        protected Node<T> root;
+    {      
+        protected Node<T> root; // the tree root
         protected IComparer<T> comparer;
+
+        // Constructors
 
         public BinTree() : this(Comparer<T>.Default)
         {
         }
+
         public BinTree(IComparer<T> defaultComparer)
         {
-            if (defaultComparer == null)
-                throw new ArgumentNullException("Default comparer is null");
-            comparer = defaultComparer;
+            //The ?? operator is called the null-coalescing operator. 
+            // It returns the left-hand operand if the operand is not null; otherwise it returns the right hand operand. 
+
+            comparer = defaultComparer ?? throw new ArgumentNullException("Default comparer is null");
         }
+
         public BinTree(IEnumerable<T> collection) : this(collection, Comparer<T>.Default)
         {
 
         }
+
         public BinTree(IEnumerable<T> collection, IComparer<T> defaultComparer) : this(defaultComparer)
         {
             AddRange(collection);
         }
 
+        // To get min value (the leftmost)
         public T MinValue
         {
             get
@@ -63,6 +46,8 @@ namespace BinaryTreeLibrary
                 return current.Value;
             }
         }
+
+        // To get max value (the rightmost)
         public T MaxValue
         {
             get
@@ -76,12 +61,14 @@ namespace BinaryTreeLibrary
             }
         }
 
+        // To add every collection value to the tree
         public void AddRange(IEnumerable<T> collection)
         {
             foreach (var value in collection)
                 Add(value);
         }
 
+        // Traversal of the tree
         public IEnumerable<T> Inorder()
         {
             if (root == null)
@@ -104,90 +91,26 @@ namespace BinaryTreeLibrary
                     node = node.Left;
                 }
             }
-        }
-        public IEnumerable<T> Preorder()
-        {
-            if (root == null)
-                yield break;
+        }        
 
-            var stack = new Stack<Node<T>>();
-            stack.Push(root);
+        // ICollection<T> Members        
 
-            while (stack.Count > 0)
-            {
-                var node = stack.Pop();
-                yield return node.Value;
-                if (node.Right != null)
-                    stack.Push(node.Right);
-                if (node.Left != null)
-                    stack.Push(node.Left);
-            }
-        }
-        public IEnumerable<T> Postorder()
-        {
-            if (root == null)
-                yield break;
-
-            var stack = new Stack<Node<T>>();
-            var node = root;
-
-            while (stack.Count > 0 || node != null)
-            {
-                if (node == null)
-                {
-                    node = stack.Pop();
-                    if (stack.Count > 0 && node.Right == stack.Peek())
-                    {
-                        stack.Pop();
-                        stack.Push(node);
-                        node = node.Right;
-                    }
-                    else
-                    {
-                        yield return node.Value;
-                        node = null;
-                    }
-                }
-                else
-                {
-                    if (node.Right != null)
-                        stack.Push(node.Right);
-                    stack.Push(node);
-                    node = node.Left;
-                }
-            }
-        }
-        public IEnumerable<T> Levelorder()
-        {
-            if (root == null)
-                yield break;
-
-            var queue = new Queue<Node<T>>();
-            queue.Enqueue(root);
-
-            while (queue.Count > 0)
-            {
-                var node = queue.Dequeue();
-                yield return node.Value;
-                if (node.Left != null)
-                    queue.Enqueue(node.Left);
-                if (node.Right != null)
-                    queue.Enqueue(node.Right);
-            }
-        }
-
-        #region ICollection<T> Members
+        // Count saves the number of tree nodes
         public int Count
         {
             get;
             protected set;
-        }
+        }            
+
+        // Add the item in the binary tree
         public virtual void Add(T item)
         {
             var node = new Node<T>(item);
 
+            // if it is the first item
             if (root == null)
                 root = node;
+            // if it is not the first item
             else
             {
                 Node<T> current = root, parent = null;
@@ -195,12 +118,13 @@ namespace BinaryTreeLibrary
                 while (current != null)
                 {
                     parent = current;
+                    
                     if (comparer.Compare(item, current.Value) < 0)
-                        current = current.Left;
+                        current = current.Left;                    
                     else
                         current = current.Right;
                 }
-
+                
                 if (comparer.Compare(item, parent.Value) < 0)
                     parent.Left = node;
                 else
@@ -208,132 +132,43 @@ namespace BinaryTreeLibrary
             }
             ++Count;
         }
-        public virtual bool Remove(T item)
+
+        // Not implemented methods
+
+        public bool IsReadOnly => throw new NotImplementedException();
+
+        public bool Remove(T item)
         {
-            if (root == null)
-                return false;
-
-            Node<T> current = root, parent = null;
-
-            int result;
-            do
-            {
-                result = comparer.Compare(item, current.Value);
-                if (result < 0)
-                {
-                    parent = current;
-                    current = current.Left;
-                }
-                else if (result > 0)
-                {
-                    parent = current;
-                    current = current.Right;
-                }
-                if (current == null)
-                    return false;
-            }
-            while (result != 0);
-
-            if (current.Right == null)
-            {
-                if (current == root)
-                    root = current.Left;
-                else
-                {
-                    result = comparer.Compare(current.Value, parent.Value);
-                    if (result < 0)
-                        parent.Left = current.Left;
-                    else
-                        parent.Right = current.Left;
-                }
-            }
-            else if (current.Right.Left == null)
-            {
-                current.Right.Left = current.Left;
-                if (current == root)
-                    root = current.Right;
-                else
-                {
-                    result = comparer.Compare(current.Value, parent.Value);
-                    if (result < 0)
-                        parent.Left = current.Right;
-                    else
-                        parent.Right = current.Right;
-                }
-            }
-            else
-            {
-                Node<T> min = current.Right.Left, prev = current.Right;
-                while (min.Left != null)
-                {
-                    prev = min;
-                    min = min.Left;
-                }
-                prev.Left = min.Right;
-                min.Left = current.Left;
-                min.Right = current.Right;
-
-                if (current == root)
-                    root = min;
-                else
-                {
-                    result = comparer.Compare(current.Value, parent.Value);
-                    if (result < 0)
-                        parent.Left = min;
-                    else
-                        parent.Right = min;
-                }
-            }
-            --Count;
-            return true;
+            throw new NotImplementedException();
         }
+
         public void Clear()
         {
-            root = null;
-            Count = 0;
+            throw new NotImplementedException();
         }
+
         public void CopyTo(T[] array, int arrayIndex)
         {
-            foreach (var value in this)
-                array[arrayIndex++] = value;
+            throw new NotImplementedException();
         }
-        public virtual bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        
         public bool Contains(T item)
         {
-            var current = root;
-            while (current != null)
-            {
-                var result = comparer.Compare(item, current.Value);
-                if (result == 0)
-                    return true;
-                if (result < 0)
-                    current = current.Left;
-                else
-                    current = current.Right;
-            }
-            return false;
-        }
-        #endregion
+            throw new NotImplementedException();
+        }  
 
+        // IEnumerable<T> Members
 
-        #region IEnumerable<T> Members
         public IEnumerator<T> GetEnumerator()
         {
             return Inorder().GetEnumerator();
         }
-        #endregion
 
-        #region IEnumerable Members
+        // IEnumerable Members
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-        #endregion
+        } 
     }
 }

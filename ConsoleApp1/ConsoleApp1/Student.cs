@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Hlazkova_8
-{
-    //Информация о студенте может содержать поля, хранящие:
-    //имя студента, 
-    //название теста, 
-    //дату его прохождения 
-    //оценку теста для данного студента
-
+{ 
     public struct Student : IComparable<Student>
     {
-        public String Name;
-        public String Test;
-        public DateTime DateOfTest;
-        public byte Mark;
+        public String Name; //name of Student
+        public String Test; //Test name
+        public DateTime DateOfTest; //Test date 
+        public byte Mark; //Mark for test
 
         public Student(String name, String test, DateTime date, byte mark)
         {
@@ -25,6 +19,7 @@ namespace Hlazkova_8
             Mark = mark;
         }
 
+        // To compare structure items by Mark
         public int CompareTo(Student other)
         {
             return Mark.CompareTo(other.Mark);
@@ -33,7 +28,6 @@ namespace Hlazkova_8
         public override string ToString()
         {
             String str = Name + " " + Test + " [" + DateOfTest.Date.ToString("d") + "] Mark = " + Mark;
-
             return str;
         }
     }
